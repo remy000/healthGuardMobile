@@ -1,7 +1,25 @@
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Picker } from '@react-native-picker/picker';
 
 const SignUp = ({navigation}) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [date, setDate] = useState('');
+    const[gender,setGender]=useState('');
+    const showDatePicker = () => {
+      setDatePickerVisibility(true);
+    };
+  
+    const hideDatePicker = () => {
+      setDatePickerVisibility(false);
+    };
+  
+    const handleConfirm = (selectedDate) => {
+      const currentDate = selectedDate || date;
+      setDate(currentDate.toISOString().split('T')[0]);
+      hideDatePicker();
+    };
   return (
     <View style={styles.container}>
      <View style={styles.header}>
@@ -10,48 +28,65 @@ const SignUp = ({navigation}) => {
        
         </View>
         <ScrollView style={styles.login}>
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
+            <Text style={styles.labels}>Names</Text>
+            <TextInput placeholder='Enter Names'
             style={styles.homeInput}
             />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
+             <Text style={styles.labels}>Email</Text>
+            <TextInput placeholder='Enter email'
             style={styles.homeInput}
             />
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
+            <Text style={styles.labels}>Phone</Text>
+            <TextInput placeholder='Enter Phone'
             style={styles.homeInput}
             />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
+             <Text style={styles.labels}>BirthDate</Text>
+             <TouchableOpacity  onPress={showDatePicker}>
+          <TextInput
+            placeholder='Choose Date'
+            style={styles.homeInput}
+            value={date}
+            editable={false}
+          />
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+        />
+            <Text style={styles.labels}>Blood Group</Text>
+            <TextInput placeholder='Enter Bllod group'
             style={styles.homeInput}
             />
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
+             <Text style={styles.labels}>Gender</Text>
+             <Picker
+            selectedValue={gender}
+            style={styles.homeInput}
+            onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+          >
+             <Picker.Item label="select" value="select" />
+            <Picker.Item label="Male" value="Male" />
+            <Picker.Item label="Female" value="Female" />
+          </Picker>
+            <Text style={styles.labels}>Weight</Text>
+            <TextInput placeholder='Enter weight'
             style={styles.homeInput}
             />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
+             <Text style={styles.labels}>Age</Text>
+            <TextInput placeholder='Enter Age'
             style={styles.homeInput}
             />
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
+            <Text style={styles.labels}>Address</Text>
+            <TextInput placeholder='Enter address'
             style={styles.homeInput}
             />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
+             <Text style={styles.labels}>Sickness</Text>
+            <TextInput placeholder='Enter sickness'
             style={styles.homeInput}
             />
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
-            style={styles.homeInput}
-            />
-            <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter Email'
+            <Text style={styles.labels}>allergies (if any)</Text>
+            <TextInput placeholder='Enter allergies'
             style={styles.homeInput}
             />
              <Text style={styles.labels}>Password</Text>
@@ -129,7 +164,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1E5DFF',
         paddingVertical: 10,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 10,
         width:'70%',
         alignSelf:'center'
       },

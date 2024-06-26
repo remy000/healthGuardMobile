@@ -3,7 +3,7 @@ import React from 'react'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Entypo from '@expo/vector-icons/Entypo';
-const Profile = () => {
+const Profile = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -18,13 +18,14 @@ const Profile = () => {
         </View>
 
         </View>
-        <TouchableOpacity style={styles.dashboard}>
+        <TouchableOpacity style={styles.dashboard} onPress={() => navigation.navigate('profile')}>
         <FontAwesome5 name="key" size={45} color="#1E5DFF"  style={styles.icon} />
         <View style={styles.content}>
           <Text style={styles.title}>Account</Text>
           <Text style={styles.subTitle}>User Information</Text>
         </View>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.dashboard}>
         <FontAwesome5 name="lock" size={45} color="#1E5DFF" style={styles.icon} />
         <View style={styles.content}>
@@ -98,19 +99,23 @@ const styles = StyleSheet.create({
         paddingVertical:20,
         borderColor:'#1E5DFF',
         borderWidth:0.2,
-        width:'100%',
+        borderEndWidth:0,
+        borderStartWidth:0,
+        width:'96%',
         height:100,
+        marginLeft:10,
+        marginRight:10,
         gap:30
     },
     names:{
-      fontSize:26,
-      fontWeight:'semibold',
+      fontSize:27,
+      fontWeight:'bold',
       color:'#1E5DFF',
     },
     age:{
       marginTop:10,
       fontSize:20,
-      fontWeight:'400'
+      fontWeight:'600'
 
     },
     content:{

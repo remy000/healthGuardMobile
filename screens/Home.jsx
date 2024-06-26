@@ -27,7 +27,7 @@ const Home = () => {
         <Fontisto name="blood" size={63} color="#7DF9FF" style={styles.icon} />
         <View style={styles.subDashboard}>
           <Text style={styles.dashboardHeader}>Blood Pressure</Text>
-          <Text style={styles.dashBoardText}>80 mg/dl</Text>
+          <Text style={styles.dashBoardText}>102 mmhg</Text>
 
         </View>
         <Text style={styles.levels}>Normal</Text>
@@ -37,7 +37,7 @@ const Home = () => {
         <FontAwesome6 name="brain" size={57} color="gray" style={styles.icon2} />
         <View style={styles.subDashboard}>
           <Text style={styles.dashboardHeader}>Stress Level</Text>
-          <Text style={styles.dashBoardText}>80 mg/dl</Text>
+          <Text style={styles.dashBoardText}>50 ms</Text>
 
         </View>
         <Text style={styles.levels1}>Normal</Text>
@@ -47,7 +47,7 @@ const Home = () => {
          <FontAwesome5 name="heartbeat" size={57} color="orange" style={styles.icon} />
         <View style={styles.subDashboard}>
           <Text style={styles.dashboardHeader}>Heart Rate</Text>
-          <Text style={styles.dashBoardText}>80 mg/dl</Text>
+          <Text style={styles.dashBoardText}>98 Bpm</Text>
 
         </View>
         <Text style={styles.levels1}>Normal</Text>

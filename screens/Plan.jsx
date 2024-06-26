@@ -2,12 +2,12 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const Plan = () => {
+const Plan = ({navigation}) => {
   return (
    <View style={styles.container}>
       <View style={styles.body}>
         <Text style={styles.header}>CarePlan</Text>
-        <FontAwesome6 name="hospital-user" size={33} color="#1E5DFF" />
+        <FontAwesome6 name="hospital-user" size={33} color="#1E5DFF" onPress={()=>navigation.navigate('appointment')} />
       </View>
       <View style={styles.home}>
         <View style={styles.dashboard}>
@@ -15,7 +15,7 @@ const Plan = () => {
           <Image source={require('../assets/p1.webp')} style={styles.images}/>
           <View style={styles.content}>
             <Text style={styles.title}>Personalized Care Plan</Text>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('personal')}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -24,11 +24,11 @@ const Plan = () => {
 
         </View>
         <View style={styles.dashboard}>
-        <View style={styles.plan}>
+        <View style={styles.plan} >
           <Image source={require('../assets/p2.jpg')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Medical Care Plan</Text>
-            <TouchableOpacity style={styles.button2}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('medical')}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -41,7 +41,7 @@ const Plan = () => {
           <Image source={require('../assets/p4.webp')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Exercises Care Plan</Text>
-            <TouchableOpacity style={styles.button2}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('exercise')}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -53,7 +53,7 @@ const Plan = () => {
           <Image source={require('../assets/p5.jpg')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Dietary Care Plan</Text>
-            <TouchableOpacity style={styles.button2}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('dietary')}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
