@@ -2,7 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
 
-const Dietary = ({navigation}) => {
+const Dietary = ({route,navigation}) => {
+  const { data } = route.params;
   return (
     <View style={styles.container}>
     <View style={styles.body}>
@@ -13,13 +14,11 @@ const Dietary = ({navigation}) => {
     </View>
     <View style={styles.content}>
     <Text style={styles.description}>
-    Follow a balanced and nutritious diet to support your overall health:
-      {"\n"}
-      Morning (8:00 AM): Whole grain oatmeal with fruits and a glass of low-fat milk.
-      {"\n"}
-      Afternoon (1:00 PM): Grilled chicken salad with a variety of vegetables and olive oil dressing.
-      {"\n"}
-      Evening (8:00 PM): Baked salmon with quinoa and steamed broccoli.
+    {data.map((sentence, index) => (
+                  <Text key={index}>
+                    {sentence.trim()}.
+                  </Text>
+                ))}
       </Text>
 
     </View>

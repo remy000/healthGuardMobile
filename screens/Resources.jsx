@@ -1,29 +1,74 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Video } from 'expo-av';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
-const videos = [
-  { id: 1, title: "Video 1", category: "diabetes", src: require('../assets/video4.mp4') },
-  { id: 2, title: "Video 2", category: "diabetes", src: require('../assets/video4.mp4') },
-  { id: 3, title: "Video 3", category: "hypertension", src: require('../assets/video4.mp4') },
-  { id: 4, title: "Video 4", category: "diabetes", src: require('../assets/video4.mp4') },
-  { id: 5, title: "Video 5", category: "hypertension", src: require('../assets/video4.mp4') },
-  { id: 6, title: "Video 6", category: "diabetes", src: require('../assets/video4.mp4') },
-  { id: 7, title: "Video 7", category: "cardio", src: require('../assets/video4.mp4') },
-  { id: 8, title: "Video 8", category: "diabetes", src: require('../assets/video4.mp4') }
-];
+import { config, getStoredData } from '../config';
+import axios from 'axios';
 
 const Resources = () => {
+  const { backendUrl } = config;
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [videos,setVideos]=useState([]);
   const [currentPlayingId, setCurrentPlayingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const videosPerPage = 3;
+  const videosPerPage = 2;
   const videoRefs = useRef({});
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    const fetchStoredData = async () => {
+      const { email, token } = await getStoredData();
+      if (email && token) {
+        setEmail(email);
+        setToken(token);
+      }
+    };
+
+    fetchStoredData();
+  }, []);
+  useEffect(() => {
+    if (email && token) {
+      const fetchPatient = async () => {
+        try {
+          const response = await axios.get(`${backendUrl}/patient/findPatientByEmail/${email}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            const data = response.data;
+            fetchVideos(data.sickness);
+          }
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+
+      const fetchVideos = async (category) => {
+        try {
+          const response = await axios.get(`${backendUrl}/resource/resourceByCategory/${category}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            const data = response.data;
+            setVideos(data);
+          }
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+
+      fetchPatient();
+    }
+  }, [email, token, backendUrl]);
+
+
   const indexOfLastVideo = currentPage * videosPerPage;
   const indexOfFirstVideo = indexOfLastVideo - videosPerPage;
-  const filteredVideos = videos.filter(video => video.category.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredVideos = videos.filter(video => video.title.toLowerCase().includes(searchTerm.toLowerCase()));
   const currentVideos = filteredVideos.slice(indexOfFirstVideo, indexOfLastVideo);
 
   const paginate = (pageNumber) => {
@@ -70,26 +115,27 @@ const Resources = () => {
           style={styles.searchInput}
         />
       </View>
-      <FlatList
+      <FlatList 
+      style={styles.lists}
         data={currentVideos}
         renderItem={({ item }) => (
           <View style={styles.videoContainer}>
-            <TouchableOpacity onPress={() => togglePlayPause(item.id)}>
+            <TouchableOpacity onPress={() => togglePlayPause(item.resourceId)}>
               <Video
-                ref={el => videoRefs.current[item.id] = el}
-                source={item.src}
+                ref={el => videoRefs.current[item.resourceId] = el}
+                source={{ uri: item.uploadPath }}
                 style={styles.video}
                 useNativeControls
                 resizeMode="contain"
-                shouldPlay={currentPlayingId === item.id}
+                shouldPlay={currentPlayingId === item.resourceId}
               />
-              {currentPlayingId !== item.id && (
+              {currentPlayingId !== item.resourceId && (
                 <View style={styles.playButtonOverlay}>
                   <Text style={styles.playButtonText}><AntDesign name="play" size={55} color="white" /></Text>
                 </View>
               )}
-               {currentPlayingId === item.id && (
-                <TouchableOpacity style={styles.closeButton} onPress={() => stopVideo(item.id)}>
+               {currentPlayingId === item.resourceId && (
+                <TouchableOpacity style={styles.closeButton} onPress={() => stopVideo(item.resourceId)}>
                   <Text style={styles.closeButtonText}>✖</Text>
                 </TouchableOpacity>
               )}
@@ -100,9 +146,9 @@ const Resources = () => {
             </TouchableOpacity>
           </View>
         )}
-        keyExtractor={item => item.id.toString()}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
+        keyExtractor={item => item.resourceId.toString()}
+        numColumns={1}
+        
       />
       <View style={styles.pagination}>
         {Array.from({ length: Math.ceil(filteredVideos.length / videosPerPage) }, (_, index) => (
@@ -153,16 +199,16 @@ const styles = StyleSheet.create({
     margin:16
   },
   videoContainer: {
-    display:'flex',
-    flexDirection:'column',
-    gap:10,
-    margin:5,
-   
+    flex: 1,
+    flexDirection: "column", 
+    gap:30, 
+    marginBottom: 10,
   },
   video: {
     width: '100%',
     aspectRatio: 16 / 9,
-    height:200
+    height: 220,
+    
   },
   playButtonOverlay: {
     position: 'absolute',
@@ -225,6 +271,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  closeButtonText:{}
 });
 
 export default Resources;

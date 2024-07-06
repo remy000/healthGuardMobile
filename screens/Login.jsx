@@ -1,6 +1,6 @@
 import { Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import config from '../config';
+import {config} from '../config.js'
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage'

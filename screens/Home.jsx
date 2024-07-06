@@ -5,7 +5,7 @@ import Fontisto from '@expo/vector-icons/Fontisto'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import config from '../config';
+import { config, getStoredData } from '../config'; 
 import axios from 'axios';
 
 const Home = () => {
@@ -17,20 +17,15 @@ const Home = () => {
   const [error,setError]=useState('');
   // console.log(email);
   useEffect(() => {
-    const getStoredData = async () => {
-      try {
-        const storedEmail = await AsyncStorage.getItem('email');
-        const storedToken = await AsyncStorage.getItem('token');
-        if (storedEmail !== null && storedToken !== null) {
-          setEmail(storedEmail);
-          setToken(storedToken);
-        }
-      } catch (error) {
-        console.error('Error retrieving stored data', error);
+    const fetchStoredData = async () => {
+      const { email, token } = await getStoredData();
+      if (email && token) {
+        setEmail(email);
+        setToken(token);
       }
     };
 
-    getStoredData();
+    fetchStoredData();
   }, []);
   useEffect(() => {
     if (email && token) {

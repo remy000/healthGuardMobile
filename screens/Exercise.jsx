@@ -2,7 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
 
-const Exercise = ({navigation}) => {
+const Exercise = ({route,navigation}) => {
+  const { data } = route.params;
   return (
     <View style={styles.container}>
     <View style={styles.body}>
@@ -13,14 +14,11 @@ const Exercise = ({navigation}) => {
     </View>
     <View style={styles.content}>
     <Text style={styles.description}>
-        Engage in a 30-minute daily exercise routine that includes a mix of cardio, 
-        Adhere to a strict medication schedule, taking prescribed medicines at the same time each day to manage your condition effectively:
-      {"\n"}
-      Morning (8:00 AM): 20 minutes of cardio exercises, such as running or cycling.
-      {"\n"}
-      Afternoon (1:00 PM): 30 minutes of strength training, focusing on major muscle groups.
-      {"\n"}
-      Evening (8:00 PM): 15 minutes of flexibility exercises, including yoga or stretching..
+    {data.map((sentence, index) => (
+                  <Text key={index}>
+                    {sentence.trim()}.
+                  </Text>
+                ))}
       </Text>
         <TouchableOpacity style={styles.report} onPress={()=>navigation.navigate('report')}>
             <Text style={styles.reportText}>Daily Report</Text>

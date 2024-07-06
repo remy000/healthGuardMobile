@@ -2,7 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
 
-const Personalised = ({navigation}) => {
+const Personalised = ({route,navigation}) => {
+  const { data } = route.params;
   return (
     <View style={styles.container}>
     <View style={styles.body}>
@@ -13,11 +14,11 @@ const Personalised = ({navigation}) => {
     </View>
     <View style={styles.content}>
     <Text style={styles.description}>
-        Engage in a 30-minute daily exercise routine that includes a mix of cardio, 
-        strength training, and flexibility exercises. Follow a customized diet plan tailored 
-        to your specific nutritional needs, ensuring a balanced intake of proteins, 
-        carbohydrates, and healthy fats. Schedule a monthly checkup with your healthcare 
-        provider to monitor your progress and make necessary adjustments to your plan.
+    {data.map((sentence, index) => (
+                  <Text key={index}>
+                    {sentence.trim()}.
+                  </Text>
+                ))}
       </Text>
 
     </View>

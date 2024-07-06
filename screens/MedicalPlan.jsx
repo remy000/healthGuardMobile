@@ -1,7 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
-const MedicalPlan = ({navigation}) => {
+const MedicalPlan = ({route,navigation}) => {
+  const { data } = route.params;
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -12,13 +13,11 @@ const MedicalPlan = ({navigation}) => {
       </View>
       <View style={styles.content}>
       <Text style={styles.description}>
-      Adhere to a strict medication schedule, taking prescribed medicines at the same time each day to manage your condition effectively:
-      {"\n"}
-      Morning (8:00 AM): Take 20mg of Lisinopril for blood pressure control.
-      {"\n"}
-      Afternoon (12:00 PM): Take 500mg of Metformin to manage blood sugar levels.
-      {"\n"}
-      Evening (8:00 PM): Take 10mg of Atorvastatin to lower cholesterol levels.
+      {data.map((sentence, index) => (
+                  <Text key={index}>
+                    {sentence.trim()}.
+                  </Text>
+                ))}
       </Text>
       </View>
     </View>

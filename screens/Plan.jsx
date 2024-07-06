@@ -1,8 +1,84 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { config, getStoredData } from '../config';
+import axios from 'axios';
 
 const Plan = ({navigation}) => {
+  const { backendUrl } = config;
+  const [error,setError]=useState('');
+  const [plan,setPlan]=useState({
+    personalizedPlan:'',
+    medicalPlan:'',
+    exercisePlan:'',
+    dietPlan:'',
+    });
+    const [email, setEmail] = useState('');
+    const [token, setToken] = useState('');
+    useEffect(() => {
+      const fetchStoredData = async () => {
+        const { email, token } = await getStoredData();
+        if (email && token) {
+          setEmail(email);
+          setToken(token);
+        }
+      };
+  
+      fetchStoredData();
+    }, []);
+    useEffect(() => {
+      if (email && token) {
+        const fetchPatient = async () => {
+          try {
+            const response = await axios.get(`${backendUrl}/patient/findPatientByEmail/${email}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            if (response.status === 200) {
+              const data = response.data;
+              fetchPlanData(data.patientId);
+            }
+          } catch (error) {
+            setError(error.message);
+          }
+        };
+  
+        const fetchPlanData = async (id) => {
+          try {
+            const response = await axios.get(`${backendUrl}/carePlan/patientPlan/${id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            if (response.status === 200) {
+              const data = response.data;
+              setPlan({
+                personalizedPlan:data.personalizedPlan,
+                medicalPlan:data.medicalPlan,
+                exercisePlan:data.exercisePlan,
+                dietPlan:data.dietPlan
+              });
+            }
+          } catch (error) {
+            setError(error.message);
+          }
+        };
+  
+        fetchPatient();
+      }
+    }, [email, token, backendUrl]);
+    const splitByPeriod = (text) => {
+      return text.split('.').filter(sentence => sentence.trim() !== '');
+    };
+    const navigateToScreen = (screenName, dataToSend) => {
+      navigation.navigate(screenName, { data: dataToSend });
+    };
+    const personalizedPlanSentences = splitByPeriod(plan.personalizedPlan);
+    const medicalPlanSentences = splitByPeriod(plan.medicalPlan);
+    const exercisePlanSentences = splitByPeriod(plan.exercisePlan);
+    const dietPlanSentences = splitByPeriod(plan.dietPlan);
+
   return (
    <View style={styles.container}>
       <View style={styles.body}>
@@ -15,7 +91,7 @@ const Plan = ({navigation}) => {
           <Image source={require('../assets/p1.webp')} style={styles.images}/>
           <View style={styles.content}>
             <Text style={styles.title}>Personalized Care Plan</Text>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('personal')}>
+            <TouchableOpacity style={styles.button} onPress={()=>navigateToScreen('personal',personalizedPlanSentences)}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -28,7 +104,7 @@ const Plan = ({navigation}) => {
           <Image source={require('../assets/p2.jpg')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Medical Care Plan</Text>
-            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('medical')}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigateToScreen('medical',medicalPlanSentences)}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -41,7 +117,7 @@ const Plan = ({navigation}) => {
           <Image source={require('../assets/p4.webp')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Exercises Care Plan</Text>
-            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('exercise')}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigateToScreen('exercise',exercisePlanSentences)}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
@@ -53,7 +129,7 @@ const Plan = ({navigation}) => {
           <Image source={require('../assets/p5.jpg')} style={styles.images}/>
           <View style={styles.content2}>
             <Text style={styles.title2}>Dietary Care Plan</Text>
-            <TouchableOpacity style={styles.button2} onPress={()=>navigation.navigate('dietary')}>
+            <TouchableOpacity style={styles.button2} onPress={()=>navigateToScreen('dietary',dietPlanSentences)}>
               <Text style={styles.text}>Open</Text>
             </TouchableOpacity>
           </View>
