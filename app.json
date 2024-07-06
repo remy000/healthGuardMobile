@@ -3,6 +3,9 @@
     "name": "healthGuard",
     "slug": "healthGuard",
     "version": "1.0.0",
+    "extra": {
+      "backendUrl": "http://192.168.1.154:8080"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
