@@ -15,7 +15,6 @@ const Home = () => {
   const [token, setToken] = useState('');
   const [name,setName]=useState('');
   const [error,setError]=useState('');
-  // console.log(email);
   useEffect(() => {
     const fetchStoredData = async () => {
       const { email, token } = await getStoredData();

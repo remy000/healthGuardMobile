@@ -2,10 +2,27 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import React, { useState } from 'react'
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Picker } from '@react-native-picker/picker';
+import { config } from '../config';
+import axios from 'axios';
 
 const SignUp = ({navigation}) => {
+  const { backendUrl } = config;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [date, setDate] = useState('');
+    const [formData, setFormData] = useState({
+      names: '',
+      email: '',
+      phoneNumber: '',
+      bloodGroup: '',
+      birthDate: date,
+      weight: '',
+      gender: '',
+      age: 0,
+      address: '',
+      sickness: '',
+      allergies: '',
+      password: ''
+    });
     const[gender,setGender]=useState('');
     const showDatePicker = () => {
       setDatePickerVisibility(true);
@@ -20,88 +37,141 @@ const SignUp = ({navigation}) => {
       setDate(currentDate.toISOString().split('T')[0]);
       hideDatePicker();
     };
+    const handleInputChange = (name, value) => {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    };
+
+   
+        const registerPatient = async () => {
+          try {
+            const response = await axios.post(`${backendUrl}/patient/register`,formData, {
+              headers: {
+                'Content-Type':'application/json'
+              }
+            });
+            if (response.status === 200) {
+              navigation.navigate("Login");
+            }
+          } catch (error) {
+            setError(error.message);
+          }
+        };
   return (
     <View style={styles.container}>
-     <View style={styles.header}>
-        <Image source={require('../assets/logo.png')} style={styles.images}/>
-        <Text style={styles.text}>Create Account</Text>
-       
-        </View>
-        <ScrollView style={styles.login}>
-            <Text style={styles.labels}>Names</Text>
-            <TextInput placeholder='Enter Names'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Email</Text>
-            <TextInput placeholder='Enter email'
-            style={styles.homeInput}
-            />
-            <Text style={styles.labels}>Phone</Text>
-            <TextInput placeholder='Enter Phone'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>BirthDate</Text>
-             <TouchableOpacity  onPress={showDatePicker}>
-          <TextInput
-            placeholder='Choose Date'
-            style={styles.homeInput}
-            value={date}
-            editable={false}
-          />
-        </TouchableOpacity>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-        />
-            <Text style={styles.labels}>Blood Group</Text>
-            <TextInput placeholder='Enter Bllod group'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Gender</Text>
-             <Picker
-            selectedValue={gender}
-            style={styles.homeInput}
-            onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
-          >
-             <Picker.Item label="select" value="select" />
-            <Picker.Item label="Male" value="Male" />
-            <Picker.Item label="Female" value="Female" />
-          </Picker>
-            <Text style={styles.labels}>Weight</Text>
-            <TextInput placeholder='Enter weight'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Age</Text>
-            <TextInput placeholder='Enter Age'
-            style={styles.homeInput}
-            />
-            <Text style={styles.labels}>Address</Text>
-            <TextInput placeholder='Enter address'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Sickness</Text>
-            <TextInput placeholder='Enter sickness'
-            style={styles.homeInput}
-            />
-            <Text style={styles.labels}>allergies (if any)</Text>
-            <TextInput placeholder='Enter allergies'
-            style={styles.homeInput}
-            />
-             <Text style={styles.labels}>Password</Text>
-            <TextInput placeholder='Enter Password'
-            style={styles.homeInput}
-            />
-           
-            </ScrollView>
-            <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginLinkText}>Already have an account? Log In</Text>
-        </TouchableOpacity>
+    <View style={styles.header}>
+      <Image source={require('../assets/logo.png')} style={styles.images}/>
+      <Text style={styles.text}>Create Account</Text>
     </View>
+    <ScrollView style={styles.login}>
+      <Text style={styles.labels}>Names</Text>
+      <TextInput
+        placeholder='Enter Names'
+        value={formData.names}
+        onChangeText={value => handleInputChange('names', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Email</Text>
+      <TextInput
+        placeholder='Enter email'
+        value={formData.email}
+        onChangeText={value => handleInputChange('email', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Phone</Text>
+      <TextInput
+        placeholder='Enter Phone'
+        value={formData.phoneNumber}
+        onChangeText={value => handleInputChange('phoneNumber', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>BirthDate</Text>
+      <TouchableOpacity onPress={showDatePicker}>
+        <TextInput
+          placeholder='Choose Date'
+          style={styles.homeInput}
+          value={date}
+          editable={false}
+        />
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <Text style={styles.labels}>Blood Group</Text>
+      <TextInput
+        placeholder='Enter Blood group'
+        value={formData.bloodGroup}
+        onChangeText={value => handleInputChange('bloodGroup', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Gender</Text>
+      <Picker
+        selectedValue={gender}
+        style={styles.homeInput}
+        onValueChange={(itemValue) => {
+          setGender(itemValue);
+          handleInputChange('gender', itemValue);
+        }}
+      >
+        <Picker.Item label="select" value="select" />
+        <Picker.Item label="Male" value="Male" />
+        <Picker.Item label="Female" value="Female" />
+      </Picker>
+      <Text style={styles.labels}>Weight</Text>
+      <TextInput
+        placeholder='Enter weight'
+        value={formData.weight}
+        onChangeText={value => handleInputChange('weight', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Age</Text>
+      <TextInput
+        placeholder='Enter Age'
+        value={formData.age.toString()}
+        onChangeText={value => handleInputChange('age', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Address</Text>
+      <TextInput
+        placeholder='Enter address'
+        value={formData.address}
+        onChangeText={value => handleInputChange('address', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Sickness</Text>
+      <TextInput
+        placeholder='Enter sickness'
+        value={formData.sickness}
+        onChangeText={value => handleInputChange('sickness', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Allergies (if any)</Text>
+      <TextInput
+        placeholder='Enter allergies'
+        value={formData.allergies}
+        onChangeText={value => handleInputChange('allergies', value)}
+        style={styles.homeInput}
+      />
+      <Text style={styles.labels}>Password</Text>
+      <TextInput
+        placeholder='Enter Password'
+        value={formData.password}
+        onChangeText={value => handleInputChange('password', value)}
+        style={styles.homeInput}
+      />
+    </ScrollView>
+    <TouchableOpacity style={styles.button} onPress={registerPatient}>
+      <Text style={styles.buttonText}>Sign Up</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
+      <Text style={styles.loginLinkText}>Already have an account? Log In</Text>
+    </TouchableOpacity>
+  </View>
   )
 }
 

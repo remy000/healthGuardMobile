@@ -1,8 +1,41 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
+import axios from 'axios';
 
 const Report = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [name,setName]=useState('');
+  const [error,setError]=useState('');
+  useEffect(() => {
+    const fetchStoredData = async () => {
+      const { email, token } = await getStoredData();
+      if (email && token) {
+        setEmail(email);
+        setToken(token);
+      }
+    };
+
+    fetchStoredData();
+  }, []);
+  const [formData, setFormData] = useState({
+    calories: '',
+    bodyWater: '',
+    exerciseDuration: '',
+    heartRate: '',
+    bloodGlucose: '',
+    bloodPressure: '',
+    stressLevel: '',
+    respirationLevel: '',
+    patientId:0
+  });
+  const handleInputChange = (name, value) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
     const inputs = [
         { label: 'Calories', placeholder: 'Enter Calories' },
         { label: 'Body Water', placeholder: 'Enter Body Water' },
@@ -13,6 +46,21 @@ const Report = ({navigation}) => {
         { label: 'Stress Level', placeholder: 'Enter Stress Level' },
         { label: 'Respiration Level', placeholder: 'Enter Respiration Level' }
       ];
+      const handleSubmit=async()=>{
+        try {
+          const response = await axios.get(`${backendUrl}/healthData/saveData`,formData, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+           navigation.navigate("Home");
+          }
+        } catch (error) {
+          setError(error.message);
+        }
+
+      }
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -33,6 +81,8 @@ const Report = ({navigation}) => {
                     <TextInput
                       placeholder={inputs[index].placeholder}
                       style={styles.homeInput}
+                      value={formData[inputs[index].name]}
+                      onChangeText={value => handleInputChange(inputs[index].name, value)}
                     />
                   </View>
                   {inputs[index + 1] && (
@@ -41,6 +91,8 @@ const Report = ({navigation}) => {
                       <TextInput
                         placeholder={inputs[index + 1].placeholder}
                         style={styles.homeInput}
+                        value={formData[inputs[index + 1].name]}
+                        onChangeText={value => handleInputChange(inputs[index + 1].name, value)}
                       />
                     </View>
                   )}
@@ -50,8 +102,8 @@ const Report = ({navigation}) => {
             return null;
           })}
         </View>
-        <TouchableOpacity style={styles.report} onPress={()=>navigation.navigate('report')}>
-            <Text style={styles.reportText}>Submit</Text>
+        <TouchableOpacity style={styles.report} onPress={handleSubmit}>
+          <Text style={styles.reportText}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

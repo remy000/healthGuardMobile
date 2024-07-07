@@ -1,9 +1,54 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Entypo from '@expo/vector-icons/Entypo';
+import { config, getStoredData } from '../config';
+import axios from 'axios';
 const Profile = ({navigation}) => {
+  const { backendUrl } = config;
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [error,setError]=useState('');
+  const [patient,setPatient] =useState({
+    names: '',
+    age: 0,
+  }
+);
+  useEffect(() => {
+    const fetchStoredData = async () => {
+      const { email, token } = await getStoredData();
+      if (email && token) {
+        setEmail(email);
+        setToken(token);
+      }
+    };
+
+    fetchStoredData();
+  }, []);
+  useEffect(() => {
+    if (email && token) {
+      const fetchPatient = async () => {
+        try {
+          const response = await axios.get(`${backendUrl}/patient/findPatientByEmail/${email}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            const data = response.data;
+            setPatient({
+              names:data.names,
+              age:data.age,          
+            });
+          }
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+      fetchPatient();
+    }
+  }, [email, token, backendUrl]);
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -13,8 +58,8 @@ const Profile = ({navigation}) => {
         <View style={styles.profile}>
         <FontAwesome5 name="user-alt" size={70} color="#1E5DFF" />
         <View>
-          <Text style={styles.names}>Dukundane Remy</Text>
-          <Text style={styles.age}>60 year</Text>
+          <Text style={styles.names}>{patient.names}</Text>
+          <Text style={styles.age}>{patient.age} year</Text>
         </View>
 
         </View>
