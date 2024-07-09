@@ -2,12 +2,26 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import React, { useEffect, useState } from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios';
+import { config, getStoredData } from '../config';
 
 const Report = ({navigation}) => {
+  const { backendUrl } = config;
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
-  const [name,setName]=useState('');
   const [error,setError]=useState('');
+  const [patientId,setPatientId]=useState(0);
+  const [formData, setFormData] = useState({
+    calories: '',
+    bodyWater: '',
+    exercisesDuration: '',
+    heartRate: '',
+    bloodGlucose: '',
+    bloodPressure: '',
+    stressLevel: '',
+    respLevel: '',
+    patientId:0
+  });
+   
   useEffect(() => {
     const fetchStoredData = async () => {
       const { email, token } = await getStoredData();
@@ -19,17 +33,30 @@ const Report = ({navigation}) => {
 
     fetchStoredData();
   }, []);
-  const [formData, setFormData] = useState({
-    calories: '',
-    bodyWater: '',
-    exerciseDuration: '',
-    heartRate: '',
-    bloodGlucose: '',
-    bloodPressure: '',
-    stressLevel: '',
-    respirationLevel: '',
-    patientId:0
-  });
+
+
+  useEffect(() => {
+    if (email && token) {
+      const fetchPatient = async () => {
+        try {
+          const response = await axios.get(`${backendUrl}/patient/findPatientByEmail/${email}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            const data = response.data;
+            setPatientId(data.patientId);
+          }
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+      fetchPatient();
+    }
+  }, [email, token, backendUrl]);
+
+
   const handleInputChange = (name, value) => {
     setFormData(prevState => ({
       ...prevState,
@@ -46,9 +73,14 @@ const Report = ({navigation}) => {
         { label: 'Stress Level', placeholder: 'Enter Stress Level' },
         { label: 'Respiration Level', placeholder: 'Enter Respiration Level' }
       ];
+
+      const healthData={
+        ...formData,
+        patientId:patientId
+      }
       const handleSubmit=async()=>{
         try {
-          const response = await axios.get(`${backendUrl}/healthData/saveData`,formData, {
+          const response = await axios.post(`${backendUrl}/healthData/saveData`,healthData, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -57,56 +89,107 @@ const Report = ({navigation}) => {
            navigation.navigate("Home");
           }
         } catch (error) {
-          setError(error.message);
+          console.log(error.message);
         }
 
       }
   return (
     <View style={styles.container}>
-      <View style={styles.body}>
-        <TouchableOpacity style={styles.back} onPress={() => navigation.navigate('Home')}>
-          <Entypo name="arrow-long-left" size={30} color="#1E5DFF" />
-          <Text style={styles.header}>Daily Report</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.contentText}>Generate your daily report for better care plans</Text>
-      <View style={styles.content}>
-        <View style={styles.homeContent}>
-          {inputs.map((input, index) => {
-            if (index % 2 === 0) {
-              return (
-                <View key={index} style={styles.row}>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.labels}>{inputs[index].label}</Text>
-                    <TextInput
-                      placeholder={inputs[index].placeholder}
-                      style={styles.homeInput}
-                      value={formData[inputs[index].name]}
-                      onChangeText={value => handleInputChange(inputs[index].name, value)}
-                    />
-                  </View>
-                  {inputs[index + 1] && (
-                    <View style={styles.inputContainer}>
-                      <Text style={styles.labels}>{inputs[index + 1].label}</Text>
-                      <TextInput
-                        placeholder={inputs[index + 1].placeholder}
-                        style={styles.homeInput}
-                        value={formData[inputs[index + 1].name]}
-                        onChangeText={value => handleInputChange(inputs[index + 1].name, value)}
-                      />
-                    </View>
-                  )}
-                </View>
-              );
-            }
-            return null;
-          })}
-        </View>
-        <TouchableOpacity style={styles.report} onPress={handleSubmit}>
-          <Text style={styles.reportText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.body}>
+      <TouchableOpacity style={styles.back} onPress={() => navigation.navigate('Home')}>
+        <Entypo name="arrow-long-left" size={30} color="#1E5DFF" />
+        <Text style={styles.header}>Daily Report</Text>
+      </TouchableOpacity>
     </View>
+    <Text style={styles.contentText}>Generate your daily report for better care plans</Text>
+    <View style={styles.content}>
+      <View style={styles.homeContent}>
+        <View style={styles.row}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Calories</Text>
+            <TextInput
+              placeholder="Enter Calories"
+              style={styles.homeInput}
+              value={formData.calories}
+              onChangeText={value => handleInputChange('calories', value)}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Body Water</Text>
+            <TextInput
+              placeholder="Enter Body Water"
+              style={styles.homeInput}
+              value={formData.bodyWater}
+              onChangeText={value => handleInputChange('bodyWater', value)}
+            />
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Exercise Duration</Text>
+            <TextInput
+              placeholder="Enter Exercise Duration"
+              style={styles.homeInput}
+              value={formData.exerciseDuration}
+              onChangeText={value => handleInputChange('exerciseDuration', value)}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Heart Rate</Text>
+            <TextInput
+              placeholder="Enter Heart Rate"
+              style={styles.homeInput}
+              value={formData.heartRate}
+              onChangeText={value => handleInputChange('heartRate', value)}
+            />
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Blood Glucose</Text>
+            <TextInput
+              placeholder="Enter Blood Glucose"
+              style={styles.homeInput}
+              value={formData.bloodGlucose}
+              onChangeText={value => handleInputChange('bloodGlucose', value)}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Blood Pressure</Text>
+            <TextInput
+              placeholder="Enter Blood Pressure"
+              style={styles.homeInput}
+              value={formData.bloodPressure}
+              onChangeText={value => handleInputChange('bloodPressure', value)}
+            />
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Stress Level</Text>
+            <TextInput
+              placeholder="Enter Stress Level"
+              style={styles.homeInput}
+              value={formData.stressLevel}
+              onChangeText={value => handleInputChange('stressLevel', value)}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labels}>Respiration Level</Text>
+            <TextInput
+              placeholder="Enter Respiration Level"
+              style={styles.homeInput}
+              value={formData.respirationLevel}
+              onChangeText={value => handleInputChange('respirationLevel', value)}
+            />
+          </View>
+        </View>
+      </View>
+      <TouchableOpacity style={styles.report} onPress={handleSubmit}>
+        <Text style={styles.reportText}>Submit</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
 );
 }
 

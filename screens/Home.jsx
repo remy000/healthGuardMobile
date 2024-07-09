@@ -61,7 +61,11 @@ const Home = () => {
         }
       };
 
+      const interval = setInterval(() => {
+        fetchPatient();
+      }, 5000);
       fetchPatient();
+      return () => clearInterval(interval);
     }
   }, [email, token, backendUrl]);
 

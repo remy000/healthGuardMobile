@@ -1,15 +1,29 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { config, getStoredData } from '../config';
+import axios from 'axios';
 
 const Appointment = ({navigation}) => {
+  const { backendUrl } = config;
     const [selectedAppointmentType, setSelectedAppointmentType] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [date, setDate] = useState('');
     const [text, setText] = useState('');
-  
+    const [email, setEmail] = useState('');
+    const [token, setToken] = useState('');
+    const [error,setError]=useState('');
+    const [patientId,setPatientId]=useState(0);
+    const [providerId,setProviderId]=useState(0);
+    const formData={
+      type:selectedAppointmentType,
+      description:text,
+      requestDate:date,
+      patientId:patientId,
+      providerId:providerId
+    }
     const showDatePicker = () => {
       setDatePickerVisibility(true);
     };
@@ -23,6 +37,56 @@ const Appointment = ({navigation}) => {
       setDate(currentDate.toISOString().split('T')[0]);
       hideDatePicker();
     };
+    useEffect(() => {
+      const fetchStoredData = async () => {
+        const { email, token } = await getStoredData();
+        if (email && token) {
+          setEmail(email);
+          setToken(token);
+        }
+      };
+  
+      fetchStoredData();
+    }, []);
+  
+  
+    useEffect(() => {
+      if (email && token) {
+        const fetchPatient = async () => {
+          try {
+            const response = await axios.get(`${backendUrl}/patient/findPatientByEmail/${email}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            if (response.status === 200) {
+              const data = response.data;
+              setPatientId(data.patientId);
+              setProviderId(data.providerId);
+            }
+          } catch (error) {
+            setError(error.message);
+          }
+        };
+        fetchPatient();
+      }
+    }, [email, token, backendUrl]);
+
+    const handleSubmit=async()=>{
+      try {
+        const response = await axios.post(`${backendUrl}/appointment/bookAppointment`,formData, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (response.status === 200) {
+         navigation.navigate("Home");
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+
+    }
   return (
     <View style={styles.container}>
     <View style={styles.body}>
@@ -71,7 +135,7 @@ const Appointment = ({navigation}) => {
 
 
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Book</Text>
         </TouchableOpacity>
 
