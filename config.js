@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const config = {
-  backendUrl: 'http://192.168.1.154:8080',
+  backendUrl: 'http://192.168.184.177:8080',
 };
 
 const getStoredData = async () => {

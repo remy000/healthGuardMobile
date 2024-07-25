@@ -14,7 +14,7 @@ const SignUp = ({navigation}) => {
       email: '',
       phoneNumber: '',
       bloodGroup: '',
-      birthDate: date,
+      birthDate: '',
       weight: '',
       gender: '',
       age: 0,
@@ -46,8 +46,12 @@ const SignUp = ({navigation}) => {
 
    
         const registerPatient = async () => {
+          const dataForm={
+            birthDate:date,
+            ...formData
+          }
           try {
-            const response = await axios.post(`${backendUrl}/patient/register`,formData, {
+            const response = await axios.post(`${backendUrl}/patient/register`,dataForm, {
               headers: {
                 'Content-Type':'application/json'
               }

@@ -1,9 +1,10 @@
-import { Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {config} from '../config.js'
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Login = ({navigation}) => {
     const { backendUrl } = config;
@@ -12,6 +13,8 @@ const Login = ({navigation}) => {
     const [token, setToken] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+  
+
     const handleLogin = async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -33,6 +36,7 @@ const Login = ({navigation}) => {
         if (response.status === 200) {
           const data = await response.data;
           setToken(data.token);
+          
         }
       } catch (error) {
         if (error.response) {
@@ -69,7 +73,10 @@ const Login = ({navigation}) => {
               await AsyncStorage.setItem('token', token);
               navigation.navigate("Home");
               setLoading(false);
+              setEmail('');
+              setPassword('')
             } else {
+              navigation.navigate("Login");
               setLoading(false); 
             }
           } catch (error) {
@@ -82,7 +89,7 @@ const Login = ({navigation}) => {
       };
   
       setAsyncStorage();
-    }, [navigation, email, token]);
+    }, [navigation, token]);
    
   return (
     <View style={styles.container}>
@@ -110,10 +117,19 @@ const Login = ({navigation}) => {
             onChangeText={setPassword}
             secureTextEntry={true}
             />
+           
+               
             </View>
+            {loading?(
+              <ActivityIndicator size="large" color="blue"/>
+            ):(
+              <>
             <View style={styles.button}>
             <Button onPress={handleLogin} title='login' style={styles.loginButton} color="#1E5DFF"/>
             </View>
+            </>
+          )}
+             
           
             <TouchableOpacity style={styles.opacity} onPress={() => navigation.navigate('SignUp')}>
               <Text style={styles.opacityText}>Not A Member? <Text style={styles.signUp}>Sign Up</Text></Text>

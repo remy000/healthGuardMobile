@@ -9,6 +9,7 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { config, getStoredData } from '../config';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PatientProfile = ({navigation}) => {
   const { backendUrl } = config;
@@ -60,8 +61,6 @@ const PatientProfile = ({navigation}) => {
               sickness:data.sickness,
               birthDate:data.birthDate,
               address:data.address,
-              
-            
             });
           }
         } catch (error) {
@@ -71,11 +70,18 @@ const PatientProfile = ({navigation}) => {
       fetchPatient();
     }
   }, [email, token, backendUrl]);
+
+  const logout=async()=>{
+    await AsyncStorage.removeItem('email');
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Home')
+  }
+
   return (
     <View style={styles.container}>
         
     <View style={styles.body}>
-    <TouchableOpacity style={styles.back} onPress={() => navigation.navigate('Home')}>
+    <TouchableOpacity style={styles.back} onPress={logout}>
         <Entypo name="arrow-long-left" size={30} color="#1E5DFF" />
         </TouchableOpacity>
       <Text style={styles.header}>User Account</Text>
@@ -125,9 +131,6 @@ const PatientProfile = ({navigation}) => {
 
       </TouchableOpacity>
       <View style={styles.account}>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.tit}>Update</Text>
-      </TouchableOpacity >
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.tit}>Logout</Text>
       </TouchableOpacity>
